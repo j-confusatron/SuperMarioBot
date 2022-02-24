@@ -50,6 +50,9 @@ the observed reward for transitioning from state_t=1 to state_t=2, and so on. Th
 to the targt + reward. The target model will periodically be updated with the values of estimated, as estimated improves.
 
 Q_estimate(s_1, a_1) <- Q_est(s_1, a_1)
+
 Q_target(s_1, a_1) <- r_1 + gamma * Q_t(s_2, argmax_a(Q_est(s_2, a)))
+
 loss <- SmoothL1Loss(Q_estimate, Q_target)
+
 AdamW.optimize(Q_est)
