@@ -26,6 +26,6 @@ def parseArgs(argsv):
 if __name__ == '__main__':
     options = parseArgs(sys.argv[1:])
     if options.mode == 'demo':
-        training.demo(options.name, options.world, options.stage, options.demo_scale, Hyperparameters())
+        training.demo(options.name, options.world, options.stage, options.demo_scale)
     if options.mode == 'train':
         training.trainModel(options.name, Hyperparameters())

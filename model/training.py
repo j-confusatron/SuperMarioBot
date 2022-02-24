@@ -193,18 +193,21 @@ def trainModel(model_name, params: Hyperparameters):
                 best_reward = metrics['reward'][-1]
                 print("Model: e=%d, r=%d" % (epoch, best_reward))
                 torch.save(learning_model.state_dict(), os.path.join(path, 'model.pth'))
+                torch.save(params.dict(), os.path.join(path, 'params.pth'))
         doCheckpoint(path, epoch, i, params, metrics, learning_model, target_model, optimizer, loss)
 
     # Training done!
     path = os.path.join('save', model_name, 'final')
     os.makedirs(path, exist_ok=True)
     torch.save(learning_model.state_dict(), os.path.join(path, 'model.pth'))
+    torch.save(params.dict(), os.path.join(path, 'params.pth'))
     saveMetrics(path, metrics)
     print('\n***************************')
     print('Model training complete!')
 
 
-def demo(model_name, world, stage, demo_scale, params: Hyperparameters):
+def demo(model_name, world, stage, demo_scale):
+    params = Hyperparameters(torch.load(os.path.join('save', model_name, 'params.pth')))
     n_actions = len(actions.action_set[params.actions])
     device = torch.device('cpu')
     model = DQN(params.image_channels, n_actions).to(device)

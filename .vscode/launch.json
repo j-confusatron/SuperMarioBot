@@ -17,7 +17,8 @@
             "request": "launch",
             "program": "smbot.py",
             "args": [
-                "--mode", "train"
+                "--mode", "train",
+                "--name", "debug"
             ],
             "console": "integratedTerminal"
         },
@@ -27,7 +28,21 @@
             "request": "launch",
             "program": "smbot.py",
             "args": [
-                "--mode", "demo"
+                "--mode", "demo",
+                "--name", "debug"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "demo 1-1",
+            "type": "python",
+            "request": "launch",
+            "program": "smbot.py",
+            "args": [
+                "--mode", "demo",
+                "--name", "1-1-bot",
+                "--world", "1",
+                "--stage", "1"
             ],
             "console": "integratedTerminal"
         }
