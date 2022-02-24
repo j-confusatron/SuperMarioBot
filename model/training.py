@@ -20,7 +20,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 def testModel(learning_model, params: Hyperparameters, device, metrics, epoch, i, epsilon):
     # Setup test variables.
     learning_model.eval()
-    env, s0, stages = getEnvironment([(8, 1)], params)
+    env, s0, stages = getEnvironment([params.test_stage], params)
     action = 0
     done = False
     r_ep = 0

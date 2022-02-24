@@ -47,7 +47,7 @@ a convolutional neural network (cnn), that receives a rendered image from SMB an
 As we do not have pre-labeled data to train the cnn with, we instead maintain two copies of the cnn: estimated and target.
 The estimated model will infer actions for the agent. The target will provide the recursive look-ahead value of Q combined with 
 the observed reward for transitioning from state_t=1 to state_t=2, and so on. The estimated model will then be trained according 
-to the targt + reward. The target model will periodically be updated with the values of estimated, as estimated improves.
+to the target + reward. The target model will periodically be updated with the values of estimated, as estimated improves.
 
 `Q_estimate(s_1, a_1) <- Q_est(s_1, a_1)`<br>
 `Q_target(s_1, a_1) <- r_1 + gamma * Q_t(s_2, argmax_a(Q_est(s_2, a)))`<br>

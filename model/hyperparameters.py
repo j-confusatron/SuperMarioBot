@@ -13,12 +13,12 @@ class Hyperparameters(object):
     ]
 
     def __init__(self, params={}) -> None:
-        self._epochs = self._getParam(params, 'epochs', 50000)
+        self._epochs = self._getParam(params, 'epochs', 200000)
         self._frame_skip = self._getParam(params, 'frame_skip', 4)
         self._image_channels = self._getParam(params, 'image_channels', 4)
-        self._mem_size = self._getParam(params, 'mem_size', 200000)
+        self._mem_size = self._getParam(params, 'mem_size', 250000)
         self._actions = self._getParam(params, 'actions', 'SIMPLE_MOVEMENT') # see environment.actions
-        self._explore_decay = self._getParam(params, 'explore_decay', 0.9999)
+        self._explore_decay = self._getParam(params, 'explore_decay', 0.99997)
         self._epsilon_minimum = self._getParam(params, 'epsilon_minimum', 0.1)
         self._gamma = self._getParam(params, 'gamma', 0.95)
         self._learning_rate = self._getParam(params, 'learning_rate', 0.00025)
@@ -29,6 +29,7 @@ class Hyperparameters(object):
         self._test_and_print = self._getParam(params, 'test_and_print', 1) # epochs
         self._clip_reward = self._getParam(params, 'clip_reward', False)
         self._stages = self._dry_stages
+        self._test_stage = self._getParam(params, 'test_stage', (8,1))
 
     def dict(self):
         return {
@@ -47,7 +48,8 @@ class Hyperparameters(object):
             'checkpoint': self._checkpoint,
             'test_and_print': self._test_and_print,
             'clip_reward': self._clip_reward,
-            'stages': self._stages
+            'stages': self._stages,
+            'test_stage': self._test_stage
         }
     
     @property
@@ -113,6 +115,10 @@ class Hyperparameters(object):
     @property
     def stages(self):
         return self._stages.copy()
+    
+    @property
+    def test_stage(self):
+        return self._test_stage
 
     def _getParam(self, params, name, default):
         return params[name] if name in params else default
