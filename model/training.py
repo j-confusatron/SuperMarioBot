@@ -30,9 +30,9 @@ def testModel(learning_model, params: Hyperparameters, device, metrics, epoch, i
     # Run a test to episode end.
     for i_ep in count():
         # Take an action and observe the result.
-        action = learning_model.act(s0, epsilon=0.0, device=device)
+        action = learning_model.act(s0.to(device), epsilon=0.0, device=device)
         s0, reward, done, info = env.step(action)
-        s0 = np.array(s0)
+        s0 = torch.tensor(np.array(s0))
         r_ep += reward
         if not x_start: x_start = info['x_pos']
         if not t_start: t_start = info['time']
@@ -55,12 +55,7 @@ def testModel(learning_model, params: Hyperparameters, device, metrics, epoch, i
 
 def replayMemories(params: Hyperparameters, learning_model, target_model, sample_memory, loss, optimizer, device):
     # Get a batch of sample sequences.
-    s0, a, r, s1, done = sample_memory.sample(params.batch_size)
-    s0 = torch.tensor(s0).float().to(device)
-    a = torch.tensor(a, dtype=torch.int64).to(device)
-    r = torch.tensor(r).to(device)
-    s1 = torch.tensor(s1).float().to(device)
-    done = torch.tensor(done).int().to(device)
+    s0, a, r, s1, done = sample_memory.sample(params.batch_size, device)
 
     # Compute the predicted and target Q values.
     q_estimate = learning_model(s0)[np.arange(0, params.batch_size), a]
@@ -88,7 +83,7 @@ def getEnvironment(stages, params: Hyperparameters, viewer=None):
     env = JoypadSpace(env, actions.action_set[params.actions])
     env = FrameStack(SmbRender(FrameSkipEnv(RewardWrapper(env, clip_reward=params.clip_reward), frame_skip=params.frame_skip, viewer=viewer)), num_stack=params.image_channels)
     render = env.reset()
-    return env, np.array(render), stages
+    return env, torch.tensor(np.array(render)), stages
 
 
 def saveMetrics(path, metrics):
@@ -132,6 +127,7 @@ def trainModel(model_name, params: Hyperparameters):
     target_model = copy.deepcopy(learning_model)
     for p in target_model.parameters():
         p.requires_grad = False
+    target_model.eval()
     loss = torch.nn.SmoothL1Loss()
     optimizer = torch.optim.AdamW(learning_model.parameters(), lr=params.learning_rate, eps=1e-4)
     sample_memory = MemoryReplay(params.mem_size)
@@ -166,10 +162,10 @@ def trainModel(model_name, params: Hyperparameters):
         # Move through the environment to completion (success or failure).
         for i_ep in count():
             # Get the next action and take it, then record the memory.
-            action = learning_model.act(s0, epsilon=epsilon, device=device)
+            action = learning_model.act(s0.to(device), epsilon=epsilon, device=device)
             s1, r, done, info = env.step(action)
-            s1 = np.array(s1)
-            sample_memory.addMemory(s0, action, r, s1, done)
+            s1 = torch.tensor(np.array(s1))
+            sample_memory.addMemory(s0, torch.tensor([action]), torch.tensor([r]), s1, torch.tensor([done]))
             s0 = s1
 
             # Train the network on stored memories.
@@ -181,6 +177,7 @@ def trainModel(model_name, params: Hyperparameters):
             if i % params.target_update == 0:
                 print("Target update: i=%d" % (i))
                 target_model.load_state_dict(learning_model.state_dict())
+                target_model.eval()
             if done:
                 break
 
@@ -221,8 +218,8 @@ def demo(model_name, world, stage, demo_scale):
 
     # Iterate over the environment until it is over.
     while not done:
-        action = model.act(obs=render, epsilon=0.0, device=device)
+        action = model.act(obs=render.to(device), epsilon=0.0, device=device)
         state, reward, done, info = env.step(action)
-        render = np.array(state)
+        render = torch.tensor(np.array(state))
         if viewer.is_escape_pressed:
             break

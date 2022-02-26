@@ -1,8 +1,10 @@
+import gym_super_mario_bros
 import gym
 from gym.spaces import Box
 from PIL import Image
 import numpy as np
 import time
+
 
 class FrameSkipEnv(gym.Wrapper):
     def __init__(self, env, frame_skip, viewer=None):

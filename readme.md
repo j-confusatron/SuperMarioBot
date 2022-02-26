@@ -35,11 +35,11 @@ See: /model/hyperparameters.py
 
 ## What is going on here?
 This application applies a technique called Reinforcement Learning to teach an intelligent agent how to navigate an environment.
-In Reinfocement Learning, an agent explores an environment and is rewarded or punished for each action it takes, according to its outcome.
+In Reinforcement Learning, an agent explores an environment and is rewarded or punished for each action it takes, according to its outcome.
 By rewarding and punishing the agent, the agent learns to take the appropriate action at each given step.
 
 Q Learning allows an agent to learn a concrete function to appropriately value every action available at a given state.
-Q Lerarning is gauranteed to converge to the optimal function. However, reaching convergence is exhaustive and not practical
+Q Learning is guaranteed to converge to the optimal function. However, reaching convergence is exhaustive and not practical
 in an environment as varied as Super Mario Bros.
 
 Instead, we substitute the Q function with Q', an estimate of Q, using a neural network. The neural network used here is
