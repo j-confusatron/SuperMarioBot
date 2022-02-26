@@ -5,6 +5,7 @@
 
 save/test/
 save/agent/
+save/slow/
 
 # User-specific files
 *.rsuser
