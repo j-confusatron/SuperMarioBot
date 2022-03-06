@@ -18,7 +18,8 @@
             "program": "smbot.py",
             "args": [
                 "--mode", "train",
-                "--name", "debug"
+                "--name", "debug",
+                "--checkpoint"
             ],
             "console": "integratedTerminal"
         },

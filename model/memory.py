@@ -22,7 +22,9 @@ class MemoryReplay(object):
         if self.filled < batch_size:
             raise Exception("Not enough samples to return.")
         if self.filled < self.mem_size:
-            s0, a, r, s1, done = map(torch.stack, zip(*random.sample(self.memory[:self.filled], batch_size)))
+            s0, a, r, s1, done = zip(*random.sample(self.memory[:self.filled], batch_size))
+            s0, a, r, s1, done = map(torch.tensor, [np.stack(s0), a, r, np.stack(s1), done])
         else:
-            s0, a, r, s1, done = map(torch.stack, zip(*random.sample(self.memory, batch_size)))
-        return s0.to(device), a.squeeze().to(device), r.squeeze().to(device), s1.to(device), done.squeeze().to(device)
+            s0, a, r, s1, done = zip(*random.sample(self.memory, batch_size))
+            s0, a, r, s1, done = map(torch.tensor, [np.stack(s0), a, r, np.stack(s1), done])
+        return s0.to(device), a.to(device), r.to(device), s1.to(device), done.to(device)

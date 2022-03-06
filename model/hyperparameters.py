@@ -18,19 +18,18 @@ class Hyperparameters(object):
         self._image_channels = self._getParam(params, 'image_channels', 4)
         self._mem_size = self._getParam(params, 'mem_size', 100000)
         self._actions = self._getParam(params, 'actions', 'RIGHT') # see environment.actions
-        self._explore_decay = self._getParam(params, 'explore_decay', 0.99997)
+        self._explore_decay = self._getParam(params, 'explore_decay', 0.999985)
         self._epsilon_minimum = self._getParam(params, 'epsilon_minimum', 0.1)
         self._gamma = self._getParam(params, 'gamma', 0.95)
         self._learning_rate = self._getParam(params, 'learning_rate', 0.00025)
         self._batch_size = self._getParam(params, 'batch_size', 64)
         self._target_update = self._getParam(params, 'target_update', 10000) # iterations
         self._metrics_save = self._getParam(params, 'metrics_save', 100) # epochs
-        self._checkpoint = self._getParam(params, 'checkpoint', 500) # epochs
+        self._checkpoint = self._getParam(params, 'checkpoint', 1000) # epochs
         self._test_and_print = self._getParam(params, 'test_and_print', 10) # epochs
         self._clip_reward = self._getParam(params, 'clip_reward', False)
         self._stages = self._dry_stages
         self._test_stage = self._getParam(params, 'test_stage', (8,1))
-        self._record_train_metrics = self._getParam(params, 'record_train_metrics', True)
 
     def dict(self):
         return {
@@ -50,8 +49,7 @@ class Hyperparameters(object):
             'test_and_print': self._test_and_print,
             'clip_reward': self._clip_reward,
             'stages': self._stages,
-            'test_stage': self._test_stage,
-            'record_train_metrics': self._record_train_metrics
+            'test_stage': self._test_stage
         }
     
     @property
@@ -121,10 +119,6 @@ class Hyperparameters(object):
     @property
     def test_stage(self):
         return self._test_stage
-
-    @property
-    def record_train_metrics(self):
-        self._record_train_metrics
 
     def _getParam(self, params, name, default):
         return params[name] if name in params else default

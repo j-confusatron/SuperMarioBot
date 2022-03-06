@@ -34,7 +34,7 @@ class DQN(nn.Module):
         out = self.linear(out)
         return out
 
-    def act(self, obs, epsilon=0.0, device=torch.device('cpu')):
+    def act(self, obs, epsilon=0.0):
         if random.random() >= epsilon:
             action = torch.argmax(self.forward(obs.unsqueeze(0))).item()
         else:
