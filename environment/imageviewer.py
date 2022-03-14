@@ -1,12 +1,13 @@
 """A simple class for viewing images using pyglet."""
-
+import numpy as np
 
 class ImageViewer(object):
     """A simple class for viewing images using pyglet."""
 
     def __init__(self, caption, height, width,
         monitor_keyboard=False,
-        relevant_keys=None
+        relevant_keys=None,
+        video=None
     ):
         """
         Initialize a new image viewer.
@@ -43,6 +44,7 @@ class ImageViewer(object):
         self._window = None
         self._pressed_keys = []
         self._is_escape_pressed = False
+        self.video = video
 
     @property
     def is_open(self):
@@ -147,6 +149,8 @@ class ImageViewer(object):
         # send the image to the window
         image.blit(0, 0, width=self._window.width, height=self._window.height)
         self._window.flip()
+        if self.video:
+            self.video.write(np.flip(frame, axis=2))
 
 
 # explicitly define the outward facing API of this module

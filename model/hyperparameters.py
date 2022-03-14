@@ -13,7 +13,7 @@ class Hyperparameters(object):
     ]
 
     def __init__(self, params={}) -> None:
-        self._epochs = self._getParam(params, 'epochs', 200000)
+        self._epochs = self._getParam(params, 'epochs', 225000)
         self._frame_skip = self._getParam(params, 'frame_skip', 4)
         self._image_channels = self._getParam(params, 'image_channels', 4)
         self._mem_size = self._getParam(params, 'mem_size', 100000)
@@ -27,6 +27,7 @@ class Hyperparameters(object):
         self._metrics_save = self._getParam(params, 'metrics_save', 100) # epochs
         self._checkpoint = self._getParam(params, 'checkpoint', 1000) # epochs
         self._test_and_print = self._getParam(params, 'test_and_print', 10) # epochs
+        self._candidate_epoch = self._getParam(params, 'candidate_epoch', 175000) # epochs
         self._clip_reward = self._getParam(params, 'clip_reward', False)
         self._stages = self._dry_stages
         self._test_stage = self._getParam(params, 'test_stage', (8,1))
@@ -107,6 +108,10 @@ class Hyperparameters(object):
     @property
     def test_and_print(self):
         return self._test_and_print
+    
+    @property
+    def candidate_epoch(self):
+        return self._candidate_epoch
     
     @property
     def clip_reward(self):

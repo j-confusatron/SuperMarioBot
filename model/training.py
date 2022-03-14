@@ -8,6 +8,7 @@ import gym_super_mario_bros
 from nes_py.wrappers import JoypadSpace
 from gym.wrappers import FrameStack
 import torch
+import cv2
 import csv
 from itertools import count
 import numpy as np
@@ -95,7 +96,7 @@ def saveMetrics(path, metrics, epoch, params: Hyperparameters):
         csv_file.writerow([v[i] for k,v in metrics.items()])
 
 
-def doCheckpoint(path, epoch, i, params: Hyperparameters, metrics, learning_model, target_model, optimizer, loss, epsilon):
+def doCheckpoint(path, epoch, i, params: Hyperparameters, metrics, learning_model, target_model, optimizer, loss, epsilon, candidate_name):
     if epoch > 0 and epoch % params.metrics_save == 0:
         print("Metrics: e=%d" % (epoch))
         saveMetrics(path, metrics, epoch, params)
@@ -111,7 +112,8 @@ def doCheckpoint(path, epoch, i, params: Hyperparameters, metrics, learning_mode
                 'learning_model': learning_model.state_dict(),
                 'target_model': target_model.state_dict(),
                 'optimizer': optimizer.state_dict(),
-                'hyperparameters': params.dict()
+                'hyperparameters': params.dict(),
+                'candidate_name': candidate_name
             }, os.path.join(path, 'checkpoint.pth'))
     except:
         print("Failure to save checkpoint at epoch %d" % (epoch))
@@ -135,8 +137,9 @@ def loadCheckpoint(model_name, device, learning_model, target_model, optimizer, 
     i = chk['i']
     metrics = chk['metrics']
     best_reward = max(metrics['reward'])
-    epsilon = chk['epsilon'] #0.59163
+    epsilon = chk['epsilon']
     params = Hyperparameters(params=chk['hyperparameters'])
+    candidate_name = chk['candidate_name']
 
     # Refill the sample memory
     print('Filling sample memory')
@@ -156,7 +159,7 @@ def loadCheckpoint(model_name, device, learning_model, target_model, optimizer, 
     print('Memory fill complete')
 
     # Return everything we loaded.
-    return learning_model, target_model, optimizer, epoch, i, metrics, best_reward, epsilon, params, sample_memory
+    return learning_model, target_model, optimizer, epoch, i, metrics, best_reward, epsilon, params, sample_memory, candidate_name
 
 def trainModel(model_name, checkpoint, params: Hyperparameters):
     # Initialize epsilon, n_actions, and device.
@@ -182,6 +185,8 @@ def trainModel(model_name, checkpoint, params: Hyperparameters):
     i = 0
     epoch = 0
     best_reward = -np.inf
+    candidate_reward = -np.inf
+    candidate_name = 0
     seconds = time.time()
     metrics = {
         'epoch': [0 for _ in range(int(params.epochs/params.test_and_print)+1)],
@@ -196,7 +201,7 @@ def trainModel(model_name, checkpoint, params: Hyperparameters):
 
     # Load a checkpoint
     if checkpoint:
-        learning_model, target_model, optimizer, epoch, i, metrics, best_reward, epsilon, params, sample_memory = \
+        learning_model, target_model, optimizer, epoch, i, metrics, best_reward, epsilon, params, sample_memory, candidate_name = \
             loadCheckpoint(model_name, device, learning_model, target_model, optimizer, sample_memory)
 
     # Main training loop.
@@ -241,12 +246,28 @@ def trainModel(model_name, checkpoint, params: Hyperparameters):
         if (epoch % params.test_and_print) == 0:
             testModel(learning_model, params, device, metrics, epoch, i, epsilon)
             i_m = int(epoch/params.test_and_print)
+
+            # Save the model, if it is the current best.
             if metrics['reward'][i_m] > best_reward:
                 best_reward = metrics['reward'][i_m]
                 print("Model: e=%d, r=%d" % (epoch, best_reward))
                 torch.save(learning_model.state_dict(), os.path.join(path, 'model.pth'))
                 torch.save(params.dict(), os.path.join(path, 'params.pth'))
-        doCheckpoint(path, epoch, i, params, metrics, learning_model, target_model, optimizer, loss, epsilon)
+
+            # Save the model, if it is the current best candidate.
+            if epoch >= params.candidate_epoch:
+                if epoch % 1000 == 0:
+                    candidate_reward = -np.inf
+                    candidate_name += 1
+                if metrics['reward'][i_m] > candidate_reward:
+                    candidate_path = os.path.join(path, str(candidate_name))
+                    os.makedirs(candidate_path, exist_ok=True)
+                    candidate_reward = metrics['reward'][i_m]
+                    print("Candidate: c=%d e=%d, r=%d" % (candidate_name, epoch, candidate_reward))
+                    torch.save(learning_model.state_dict(), os.path.join(candidate_path, 'model.pth'))
+                    torch.save(params.dict(), os.path.join(candidate_path, 'params.pth'))
+
+        doCheckpoint(path, epoch, i, params, metrics, learning_model, target_model, optimizer, loss, epsilon, candidate_name)
         epoch += 1
 
     # Training done!
@@ -259,7 +280,7 @@ def trainModel(model_name, checkpoint, params: Hyperparameters):
     print('Model training complete!')
 
 
-def demo(model_name, world, stage, demo_scale, checkpoint):
+def demo(model_name, world, stage, demo_scale, checkpoint, record):
     params = Hyperparameters(torch.load(os.path.join('save', model_name, 'params.pth')))
     n_actions = len(actions.action_set[params.actions])
     device = torch.device('cpu')
@@ -273,7 +294,13 @@ def demo(model_name, world, stage, demo_scale, checkpoint):
         print("Model loaded from file")
     model.eval()
 
-    viewer = ImageViewer('Super Mario Bot', 240*demo_scale, 256*demo_scale, monitor_keyboard=True, relevant_keys=None)
+    video = None
+    if record:
+        vidFile = os.path.join('save', model_name, 'demo.avi')
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        video = cv2.VideoWriter(vidFile, fourcc, 60, (256,240))
+
+    viewer = ImageViewer('Super Mario Bot', 240*demo_scale, 256*demo_scale, monitor_keyboard=True, relevant_keys=None, video=video)
     env, render, stages = getEnvironment([(world,stage)], params, viewer=viewer)
     done = False
     action = 0
@@ -285,3 +312,7 @@ def demo(model_name, world, stage, demo_scale, checkpoint):
         render = np.array(state)
         if viewer.is_escape_pressed:
             break
+
+    if record:
+        video.release()
+        cv2.destroyAllWindows()

@@ -30,7 +30,8 @@
             "program": "smbot.py",
             "args": [
                 "--mode", "demo",
-                "--name", "debug"
+                "--name", "debug",
+                "--record"
             ],
             "console": "integratedTerminal"
         },
@@ -43,7 +44,8 @@
                 "--mode", "demo",
                 "--name", "1-1-bot",
                 "--world", "1",
-                "--stage", "1"
+                "--stage", "1",
+                "--record"
             ],
             "console": "integratedTerminal"
         }

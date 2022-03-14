@@ -7,7 +7,7 @@ import time
 
 
 class FrameSkipEnv(gym.Wrapper):
-    def __init__(self, env, frame_skip, viewer=None):
+    def __init__(self, env, frame_skip, viewer=None, record=False):
         super().__init__(env)
         self.env = env
         self.frame_skip = frame_skip

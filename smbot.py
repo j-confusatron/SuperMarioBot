@@ -20,6 +20,7 @@ def parseArgs(argsv):
     parser.add_option('--demoscale', dest='demo_scale', type=int,
                       help='The SCALE to multiply the NES demo viewer resolution by', metavar='STAGE', default=4)
     parser.add_option("--checkpoint", action="store_true", dest="checkpoint", default=False)
+    parser.add_option("--record", action="store_true", dest="record", default=False)
 
     options, _ = parser.parse_args(argsv)
     return options
@@ -27,6 +28,6 @@ def parseArgs(argsv):
 if __name__ == '__main__':
     options = parseArgs(sys.argv[1:])
     if options.mode == 'demo':
-        training.demo(options.name, options.world, options.stage, options.demo_scale, options.checkpoint)
+        training.demo(options.name, options.world, options.stage, options.demo_scale, options.checkpoint, options.record)
     if options.mode == 'train':
         training.trainModel(options.name, options.checkpoint, Hyperparameters())

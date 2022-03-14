@@ -15,6 +15,7 @@ If you'd like to watch a prebuilt agent play level 1-1:
     - *nix: Check to see if clang is already installed: `clang --version`, else see https://github.com/Kautenja/nes-py for instructions.
 - NES-Py: `pip install nes-py` https://github.com/Kautenja/nes-py (not available via Conda)
 - gym-super-mario-bros `pip install gym-super-mario-bros` https://github.com/Kautenja/gym-super-mario-bros (not available via Conda)
+- OpenCV `pip install opencv-contrib-python`
 
 ## Build Environment
 - Windows 11
@@ -32,6 +33,8 @@ See: /model/hyperparameters.py
 - --world       If mode is demo, set the world to load. Default is 1.
 - --stage       If mode is demo, set the stage to load. Default is 1.
 - --demoscale   If mode is demo, scale the output image by this integer. Scale 1 resolution is 240x256. Default is 4.
+- --checkpoint  If exists, will load a checkpoint file from disk to resume training from. If mode is demo, will load the checkpoint file rather than the model file.
+- --record      If exists and mode is demo, will record a video of the demo.
 
 ## What is going on here?
 This application applies a technique called Reinforcement Learning to teach an intelligent agent how to navigate an environment.
