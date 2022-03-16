@@ -2,6 +2,7 @@ from optparse import OptionParser
 import sys
 from model.hyperparameters import Hyperparameters
 import model.training as training
+import json
 
 def parseArgs(argsv):
     usage = """
@@ -27,7 +28,9 @@ def parseArgs(argsv):
 
 if __name__ == '__main__':
     options = parseArgs(sys.argv[1:])
-    if options.mode == 'demo':
+    if options.mode == 'print':
+        print(json.dumps(Hyperparameters().dict(), indent=4))
+    elif options.mode == 'demo':
         training.demo(options.name, options.world, options.stage, options.demo_scale, options.checkpoint, options.record)
-    if options.mode == 'train':
+    elif options.mode == 'train':
         training.trainModel(options.name, options.checkpoint, Hyperparameters())

@@ -13,13 +13,13 @@ class Hyperparameters(object):
     ]
 
     def __init__(self, params={}) -> None:
-        self._epochs = self._getParam(params, 'epochs', 225000)
+        self._epochs = self._getParam(params, 'epochs', 60000)
         self._frame_skip = self._getParam(params, 'frame_skip', 4)
         self._image_channels = self._getParam(params, 'image_channels', 4)
         self._mem_size = self._getParam(params, 'mem_size', 100000)
-        self._actions = self._getParam(params, 'actions', 'RIGHT') # see environment.actions
-        self._explore_decay = self._getParam(params, 'explore_decay', 0.999985)
-        self._epsilon_minimum = self._getParam(params, 'epsilon_minimum', 0.1)
+        self._actions = self._getParam(params, 'actions', 'SIMPLE_RIGHT') # see environment.actions
+        self._explore_decay = self._getParam(params, 'explore_decay', 0.999958)
+        self._epsilon_minimum = self._getParam(params, 'epsilon_minimum', 0.125)
         self._gamma = self._getParam(params, 'gamma', 0.95)
         self._learning_rate = self._getParam(params, 'learning_rate', 0.00025)
         self._batch_size = self._getParam(params, 'batch_size', 64)
@@ -27,10 +27,10 @@ class Hyperparameters(object):
         self._metrics_save = self._getParam(params, 'metrics_save', 100) # epochs
         self._checkpoint = self._getParam(params, 'checkpoint', 1000) # epochs
         self._test_and_print = self._getParam(params, 'test_and_print', 10) # epochs
-        self._candidate_epoch = self._getParam(params, 'candidate_epoch', 175000) # epochs
+        self._candidate_epoch = self._getParam(params, 'candidate_epoch', 50000) # epochs
         self._clip_reward = self._getParam(params, 'clip_reward', False)
-        self._stages = self._dry_stages
-        self._test_stage = self._getParam(params, 'test_stage', (8,1))
+        self._stages = self._getParam(params, 'stages', [(1,1)])
+        self._test_stage = self._getParam(params, 'test_stage', (1,1))
 
     def dict(self):
         return {

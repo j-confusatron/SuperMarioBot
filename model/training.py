@@ -49,8 +49,8 @@ def testModel(learning_model, params: Hyperparameters, device, metrics, epoch, i
             metrics['success'][i_m] = 1 if info['flag_get'] else 0
             metrics['iterations'][i_m] = i_ep+1
             metrics['time'][i_m] = np.abs(info['time']-t_start)
-            if i_m >= 10:
-                metrics['mean'][i_m] = np.mean(metrics['reward'][i_m-10:i_m])
+            if i_m >= 300:
+                metrics['mean'][i_m] = np.mean(metrics['reward'][i_m-300:i_m])
             break
     
     # Print the results.
