@@ -1,4 +1,6 @@
 # Super Mario Bot
+[Paper](https://github.com/j-confusatron/SuperMarioBot/blob/main/Learning%20SMB.pdf)
+
 Teach an agent to play Super Mario Bros. using DDQN learning!
 https://arxiv.org/pdf/1509.06461.pdf
 
